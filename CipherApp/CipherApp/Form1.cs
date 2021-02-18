@@ -1,0 +1,134 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+/*
+ * 
+ * TODO:
+ * Keys less than 3 do not work.
+ * Decrypt Function
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+namespace CipherApp
+{
+    public partial class Form1 : Form
+    {
+
+        private string cipherText = "";
+        private string plainText = "";
+        public Form1()
+        {
+            InitializeComponent();
+
+            lbCiphers.Items.Add("Rail-Fence");
+
+        }
+
+        private string railFenceCipher(string s)
+        {
+            cipherText = "";
+            bool goingDown = true;
+            int key = int.Parse(tbKey.Text);
+            int railCounter = 0;
+            int textLength = tbInputText.Text.Length;
+            char[,] cipherArray = new char[textLength, key];
+
+            for(int i = 0; i < textLength; i++)
+            {
+                if(Char.IsLetterOrDigit(s[i]))
+                {
+                    if (goingDown)
+                    {
+                        cipherArray[i, railCounter] = s[i];
+                    }
+                    else
+                    {
+                        cipherArray[i, (2 * (key - 1) - railCounter)] = s[i];
+                    }
+
+                    railCounter++;
+                    if (railCounter == key)
+                    {
+                        goingDown = false;
+
+                    }
+                    else if (railCounter == 2 * (key - 1))
+                    {
+                        railCounter = 0;
+                        goingDown = true;
+                    }
+                }
+                
+            }
+
+            for(int i = 0; i < key; i++)
+            {
+                for(int j = 0; j < textLength; j++)
+                {
+                    if(Char.IsLetterOrDigit(cipherArray[j,i]))
+                    {
+                        cipherText += Char.ToLower(cipherArray[j, i]);
+                    }
+                }
+            }
+
+            return cipherText;
+        }
+
+
+        private string encryptText(string s)
+        {
+            if(lbCiphers.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a cipher to use!", "Warning!");
+                return null;
+            }
+
+            switch (lbCiphers.SelectedItem.ToString())
+            {
+                case "Rail-Fence":
+                    cipherText = railFenceCipher(s);
+                    break;
+                default:
+                    break;
+            }
+
+            return cipherText;
+        }
+
+        private string decryptText(string s)
+        {
+            
+
+
+            return cipherText;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void bEncrypt_Click(object sender, EventArgs e)
+        {
+            plainText = tbInputText.Text;
+            tbOutputText.Text = encryptText(plainText);
+        }
+
+        private void bDecrypt_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
