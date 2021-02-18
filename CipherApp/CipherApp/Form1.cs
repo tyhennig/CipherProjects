@@ -38,35 +38,44 @@ namespace CipherApp
 
         private string railFenceCipher(string s)
         {
+            int key = int.Parse(tbKey.Text);
+
+            if (key <= 1)
+            {
+                return s;
+            }
             cipherText = "";
             bool goingDown = true;
-            int key = int.Parse(tbKey.Text);
             int railCounter = 0;
             int textLength = tbInputText.Text.Length;
             char[,] cipherArray = new char[textLength, key];
+            
 
             for(int i = 0; i < textLength; i++)
             {
                 if(Char.IsLetterOrDigit(s[i]))
                 {
+
+                    cipherArray[i, railCounter] = s[i];
+
                     if (goingDown)
                     {
-                        cipherArray[i, railCounter] = s[i];
+                        //cipherArray[i, railCounter] = s[i];
+                        railCounter++;
                     }
                     else
                     {
-                        cipherArray[i, (2 * (key - 1) - railCounter)] = s[i];
+                        //cipherArray[i, (2 * (key - 1) - railCounter)] = s[i];
+                        railCounter--;
                     }
 
-                    railCounter++;
-                    if (railCounter == key)
+                    if (railCounter == key-1)
                     {
                         goingDown = false;
 
                     }
-                    else if (railCounter == 2 * (key - 1))
+                    else if (railCounter == 0)
                     {
-                        railCounter = 0;
                         goingDown = true;
                     }
                 }
