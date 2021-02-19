@@ -96,6 +96,56 @@ namespace CipherApp
             return cipherText;
         }
 
+        private string railFenceDecipher(string s)
+        {
+            int key = int.Parse(tbKey.Text);
+
+            if (key <= 1)
+            {
+                return s;
+            }
+            plainText = "";
+            bool goingDown = true;
+            int railCounter = 0;
+            int textLength = tbInputText.Text.Length;
+            char[,] cipherArray = new char[textLength, key];
+
+            for (int i = 0; i < textLength; i++)
+            {
+                if (Char.IsLetterOrDigit(s[i]))
+                {
+
+                    //cipherArray[i, railCounter] = s[i];
+
+                    if (goingDown)
+                    {
+                        
+                        railCounter++;
+                    }
+                    else
+                    {
+                        
+                        railCounter--;
+                    }
+
+                    if (railCounter == key - 1)
+                    {
+                        goingDown = false;
+
+                    }
+                    else if (railCounter == 0)
+                    {
+                        goingDown = true;
+                    }
+                }
+
+            }
+
+
+
+            return cipherText;
+        }
+
 
         private string encryptText(string s)
         {
@@ -119,10 +169,22 @@ namespace CipherApp
 
         private string decryptText(string s)
         {
-            
+            if (lbCiphers.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a cipher to use!", "Warning!");
+                return null;
+            }
 
+            switch (lbCiphers.SelectedItem.ToString())
+            {
+                case "Rail-Fence":
+                    plainText = railFenceDecipher(s);
+                    break;
+                default:
+                    break;
+            }
 
-            return cipherText;
+            return plainText;
         }
 
         private void label1_Click(object sender, EventArgs e)
