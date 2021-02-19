@@ -99,7 +99,7 @@ namespace CipherApp
         private string railFenceDecipher(string s)
         {
             int key = int.Parse(tbKey.Text);
-
+             
             if (key <= 1)
             {
                 return s;
@@ -114,24 +114,20 @@ namespace CipherApp
             {
                 if (Char.IsLetterOrDigit(s[i]))
                 {
-
-                    //cipherArray[i, railCounter] = s[i];
+                    cipherArray[i, railCounter] = '*';
 
                     if (goingDown)
                     {
-                        
                         railCounter++;
                     }
                     else
                     {
-                        
                         railCounter--;
                     }
 
                     if (railCounter == key - 1)
                     {
                         goingDown = false;
-
                     }
                     else if (railCounter == 0)
                     {
@@ -141,9 +137,47 @@ namespace CipherApp
 
             }
 
+            int letterIncrement = 0;
+            for (int i = 0; i < key; i++)
+            {
+                for (int j = 0; j < textLength; j++)
+                {
+                    if(cipherArray[j,i] == '*')
+                    {
+                        cipherArray[j, i] = s[letterIncrement++];
+                    }
+                }
+            }
+            railCounter = 0;
+            goingDown = true;
+            for (int i = 0; i < textLength; i++)
+            {
+                plainText += cipherArray[i, railCounter];
+
+                if (goingDown)
+                {
+                    railCounter++;
+                }
+                else
+                {
+                    railCounter--;
+                }
+
+                if (railCounter == key - 1)
+                {
+                    goingDown = false;
+                }
+                else if (railCounter == 0)
+                {
+                    goingDown = true;
+                }
+                
+
+            }
 
 
-            return cipherText;
+
+            return plainText;
         }
 
 
@@ -199,7 +233,8 @@ namespace CipherApp
 
         private void bDecrypt_Click(object sender, EventArgs e)
         {
-
+            cipherText = tbInputText.Text;
+            tbOutputText.Text = decryptText(cipherText);
         }
     }
 }
