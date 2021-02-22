@@ -8,18 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-/*
- * 
- * TODO:
- * Keys less than 3 do not work.
- * Decrypt Function
- * 
- * 
- * 
- * 
- * 
- * 
- */
+
 
 namespace CipherApp
 {
@@ -36,21 +25,23 @@ namespace CipherApp
 
         }
 
-        private string railFenceCipher(string s)
+        private string railFenceCipher(string s) //function to encrypt using rail-fence
         {
-            int key = int.Parse(tbKey.Text);
+            int key = int.Parse(tbKey.Text); //get the key from text box
 
             if (key <= 1)
             {
                 return s;
             }
+
             cipherText = "";
             bool goingDown = true;
-            int railCounter = 0;
+            int railCounter = 0; //railCounter is used to keep track of which rail we are currently on (adding character to)
             int textLength = tbInputText.Text.Length;
-            char[,] cipherArray = new char[textLength, key];
+            char[,] cipherArray = new char[textLength, key]; //create a 2D array of size textLength*key to store the zig zag placement
             
 
+            //Loop that inserts each character in the string to its location in the 2D array
             for(int i = 0; i < textLength; i++)
             {
                 if(Char.IsLetterOrDigit(s[i]))
@@ -58,9 +49,9 @@ namespace CipherApp
 
                     cipherArray[i, railCounter] = s[i];
 
+                    //increment railCounter up or down depending on if we are heading up or down the rails
                     if (goingDown)
                     {
-                        //cipherArray[i, railCounter] = s[i];
                         railCounter++;
                     }
                     else
@@ -69,11 +60,12 @@ namespace CipherApp
                         railCounter--;
                     }
 
+                    //check if we are on the bottom rail
                     if (railCounter == key-1)
                     {
                         goingDown = false;
-
                     }
+                    //check if we are on the top rail
                     else if (railCounter == 0)
                     {
                         goingDown = true;
@@ -86,6 +78,7 @@ namespace CipherApp
             {
                 for(int j = 0; j < textLength; j++)
                 {
+                    //go through every space in the 2D array, if we put a letter there, add the letter to the cipher text
                     if(Char.IsLetterOrDigit(cipherArray[j,i]))
                     {
                         cipherText += Char.ToLower(cipherArray[j, i]);
@@ -96,7 +89,7 @@ namespace CipherApp
             return cipherText;
         }
 
-        private string railFenceDecipher(string s)
+        private string railFenceDecipher(string s) //rail-fence deciphering algorithm
         {
             int key = int.Parse(tbKey.Text);
              
@@ -110,7 +103,13 @@ namespace CipherApp
             int textLength = tbInputText.Text.Length;
             char[,] cipherArray = new char[textLength, key];
 
-            for (int i = 0; i < textLength; i++)
+            //functions almost identically to the encryption, however instead of placing the letter we place an arbitrary '*'
+            //This allows us to keep track of where the "zig zag" pattern is
+            //*...*...*..
+            //.*.*.*.*.*.
+            //..*...*...* etc...
+
+            for (int i = 0; i < textLength; i++) 
             {
                 if (Char.IsLetterOrDigit(s[i]))
                 {
@@ -142,6 +141,7 @@ namespace CipherApp
             {
                 for (int j = 0; j < textLength; j++)
                 {
+                    //for this loop we place the letters of the cipher text into the locations marked by a '*'
                     if(cipherArray[j,i] == '*')
                     {
                         cipherArray[j, i] = s[letterIncrement++];
@@ -150,6 +150,7 @@ namespace CipherApp
             }
             railCounter = 0;
             goingDown = true;
+            //finally we "zig zag" through the array placing each letter in order into the plaintext
             for (int i = 0; i < textLength; i++)
             {
                 plainText += cipherArray[i, railCounter];
@@ -181,7 +182,7 @@ namespace CipherApp
         }
 
 
-        private string encryptText(string s)
+        private string encryptText(string s) //function to select correct cipher algorithm. Chance to add more ciphers in the future
         {
             if(lbCiphers.SelectedItem == null)
             {
@@ -225,13 +226,13 @@ namespace CipherApp
         {
         }
 
-        private void bEncrypt_Click(object sender, EventArgs e)
+        private void bEncrypt_Click(object sender, EventArgs e) //When encrypt button is clicked
         {
             plainText = tbInputText.Text;
             tbOutputText.Text = encryptText(plainText);
         }
 
-        private void bDecrypt_Click(object sender, EventArgs e)
+        private void bDecrypt_Click(object sender, EventArgs e) //When decrypt button is clicked
         {
             cipherText = tbInputText.Text;
             tbOutputText.Text = decryptText(cipherText);
