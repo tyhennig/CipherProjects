@@ -22,154 +22,15 @@ namespace CipherApp
             InitializeComponent();
 
             lbCiphers.Items.Add("Rail-Fence");
+            lbCiphers.Items.Add("DES");
 
         }
-        /*
-        private string railFenceCipher(string s) //function to encrypt using rail-fence
-        {
-            int key = int.Parse(tbKey.Text); //get the key from text box
-
-            if (key <= 1){
-                return s;
-            }
-            cipherText = "";
-            bool goingDown = true;
-            int railCounter = 0; //railCounter is used to keep track of which rail we are currently on (adding character to)
-            int textLength = tbInputText.Text.Length;
-            char[,] cipherArray = new char[textLength, key]; //create a 2D array of size textLength*key to store the zig zag placement
-
-            //Loop that inserts each character in the string to its location in the 2D array
-            for(int i = 0; i < textLength; i++)
-            {
-                if(Char.IsLetterOrDigit(s[i]))
-                {
-                    cipherArray[i, railCounter] = s[i];
-                    //increment railCounter up or down depending on if we are heading up or down the rails
-                    if (goingDown)
-                    {
-                        railCounter++;
-                    }
-                    else
-                    {
-                        //cipherArray[i, (2 * (key - 1) - railCounter)] = s[i];
-                        railCounter--;
-                    }
-                    //check if we are on the bottom rail
-                    if (railCounter == key-1)
-                    {
-                        goingDown = false;
-                    }
-                    //check if we are on the top rail
-                    else if (railCounter == 0)
-                    {
-                        goingDown = true;
-                    }
-                }
-                
-            }
-
-            for(int i = 0; i < key; i++) {
-                for(int j = 0; j < textLength; j++) {
-                    //go through every space in the 2D array, if we put a letter there, add the letter to the cipher text
-                    if(Char.IsLetterOrDigit(cipherArray[j,i])){
-                        cipherText += Char.ToLower(cipherArray[j, i]);
-                    }
-                }
-            }
-            return cipherText;
-        }
-        */
-        private string railFenceDecipher(string s) //rail-fence deciphering algorithm
-        {
-            int key = int.Parse(tbKey.Text);
-             
-            if (key <= 1)
-            {
-                return s;
-            }
-            plainText = "";
-            bool goingDown = true;
-            int railCounter = 0;
-            int textLength = tbInputText.Text.Length;
-            char[,] cipherArray = new char[textLength, key];
-
-            //functions almost identically to the encryption, however instead of placing the letter we place an arbitrary '*'
-            //This allows us to keep track of where the "zig zag" pattern is
-            //*...*...*..
-            //.*.*.*.*.*.
-            //..*...*...* etc...
-
-            for (int i = 0; i < textLength; i++) 
-            {
-                if (Char.IsLetterOrDigit(s[i]))
-                {
-                    cipherArray[i, railCounter] = '*';
-
-                    if (goingDown)
-                    {
-                        railCounter++;
-                    }
-                    else
-                    {
-                        railCounter--;
-                    }
-
-                    if (railCounter == key - 1)
-                    {
-                        goingDown = false;
-                    }
-                    else if (railCounter == 0)
-                    {
-                        goingDown = true;
-                    }
-                }
-
-            }
-
-            int letterIncrement = 0;
-            for (int i = 0; i < key; i++)
-            {
-                for (int j = 0; j < textLength; j++)
-                {
-                    //for this loop we place the letters of the cipher text into the locations marked by a '*'
-                    if(cipherArray[j,i] == '*')
-                    {
-                        cipherArray[j, i] = s[letterIncrement++];
-                    }
-                }
-            }
-            railCounter = 0;
-            goingDown = true;
-            //finally we "zig zag" through the array placing each letter in order into the plaintext
-            for (int i = 0; i < textLength; i++)
-            {
-                plainText += cipherArray[i, railCounter];
-
-                if (goingDown)
-                {
-                    railCounter++;
-                }
-                else
-                {
-                    railCounter--;
-                }
-
-                if (railCounter == key - 1)
-                {
-                    goingDown = false;
-                }
-                else if (railCounter == 0)
-                {
-                    goingDown = true;
-                }
-
-            }
-            return plainText;
-        }
+        
 
 
         private string encryptText(string s) //function to select correct cipher algorithm. Chance to add more ciphers in the future
         {
+            int key = int.Parse(tbKey.Text);
             if(lbCiphers.SelectedItem == null)
             {
                 MessageBox.Show("Please select a cipher to use!", "Warning!");
@@ -179,7 +40,10 @@ namespace CipherApp
             switch (lbCiphers.SelectedItem.ToString())
             {
                 case "Rail-Fence":
-                    cipherText = railFenceCipher(s);
+                    cipherText = RailFence.encrypt(s, key);
+                    break;
+                case "DES":
+                    cipherText = DES.encrypt(s, key);
                     break;
                 default:
                     break;
@@ -189,6 +53,7 @@ namespace CipherApp
 
         private string decryptText(string s)
         {
+            int key = int.Parse(tbKey.Text);
             if (lbCiphers.SelectedItem == null)
             {
                 MessageBox.Show("Please select a cipher to use!", "Warning!");
@@ -198,7 +63,7 @@ namespace CipherApp
             switch (lbCiphers.SelectedItem.ToString())
             {
                 case "Rail-Fence":
-                    plainText = railFenceDecipher(s);
+                    plainText = RailFence.decrypt(s, key);
                     break;
                 default:
                     break;

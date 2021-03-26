@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace CipherApp
 {
-    class DES
+    public static class DES
     {
+
+
+        public static string encrypt(string m, int k)
+        {
+            string cipherText = "";
+
+
+            return cipherText;
+        }
+
     }
 }

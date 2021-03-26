@@ -10,12 +10,13 @@ using System.Windows.Forms;
 
 namespace CipherApp
 {
-    public partial class Form1: Form
+    public static class RailFence
     {
 
-        private string railFenceCipher(string s) //function to encrypt using rail-fence
+        public static string encrypt(string s, int k) //function to encrypt using rail-fence
         {
-            int key = int.Parse(tbKey.Text); //get the key from text box
+            string cipherText;
+            int key = k; //get the key from text box
 
             if (key <= 1)
             {
@@ -24,7 +25,7 @@ namespace CipherApp
             cipherText = "";
             bool goingDown = true;
             int railCounter = 0; //railCounter is used to keep track of which rail we are currently on (adding character to)
-            int textLength = tbInputText.Text.Length;
+            int textLength = s.Length;
             char[,] cipherArray = new char[textLength, key]; //create a 2D array of size textLength*key to store the zig zag placement
 
             //Loop that inserts each character in the string to its location in the 2D array
@@ -72,7 +73,96 @@ namespace CipherApp
         }
 
 
+
+
+
+        public static string decrypt(string s, int k) //rail-fence deciphering algorithm
+        {
+            int key = k;
+
+            if (key <= 1)
+            {
+                return s;
+            }
+            string plainText = "";
+            bool goingDown = true;
+            int railCounter = 0;
+            int textLength = s.Length;
+            char[,] cipherArray = new char[textLength, key];
+
+            //functions almost identically to the encryption, however instead of placing the letter we place an arbitrary '*'
+            //This allows us to keep track of where the "zig zag" pattern is
+            //*...*...*..
+            //.*.*.*.*.*.
+            //..*...*...* etc...
+
+            for (int i = 0; i < textLength; i++)
+            {
+                if (Char.IsLetterOrDigit(s[i]))
+                {
+                    cipherArray[i, railCounter] = '*';
+
+                    if (goingDown)
+                    {
+                        railCounter++;
+                    }
+                    else
+                    {
+                        railCounter--;
+                    }
+
+                    if (railCounter == key - 1)
+                    {
+                        goingDown = false;
+                    }
+                    else if (railCounter == 0)
+                    {
+                        goingDown = true;
+                    }
+                }
+
+            }
+
+            int letterIncrement = 0;
+            for (int i = 0; i < key; i++)
+            {
+                for (int j = 0; j < textLength; j++)
+                {
+                    //for this loop we place the letters of the cipher text into the locations marked by a '*'
+                    if (cipherArray[j, i] == '*')
+                    {
+                        cipherArray[j, i] = s[letterIncrement++];
+                    }
+                }
+            }
+            railCounter = 0;
+            goingDown = true;
+            //finally we "zig zag" through the array placing each letter in order into the plaintext
+            for (int i = 0; i < textLength; i++)
+            {
+                plainText += cipherArray[i, railCounter];
+
+                if (goingDown)
+                {
+                    railCounter++;
+                }
+                else
+                {
+                    railCounter--;
+                }
+
+                if (railCounter == key - 1)
+                {
+                    goingDown = false;
+                }
+                else if (railCounter == 0)
+                {
+                    goingDown = true;
+                }
+
+            }
+            return plainText;
+        }
+
     }
-
-
 }
