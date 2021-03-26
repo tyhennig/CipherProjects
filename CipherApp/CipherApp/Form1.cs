@@ -30,20 +30,24 @@ namespace CipherApp
 
         private string encryptText(string s) //function to select correct cipher algorithm. Chance to add more ciphers in the future
         {
-            int key = int.Parse(tbKey.Text);
             if(lbCiphers.SelectedItem == null)
             {
                 MessageBox.Show("Please select a cipher to use!", "Warning!");
+                return null;
+            }
+            if(s.Length <= 0)
+            {
+                MessageBox.Show("Please type plain text to encrypt");
                 return null;
             }
 
             switch (lbCiphers.SelectedItem.ToString())
             {
                 case "Rail-Fence":
-                    cipherText = RailFence.encrypt(s, key);
+                    cipherText = RailFence.encrypt(s, tbKey.Text);
                     break;
                 case "DES":
-                    cipherText = DES.encrypt(s, key);
+                    cipherText = DES.encrypt(s, tbKey.Text);
                     break;
                 default:
                     break;
@@ -53,7 +57,6 @@ namespace CipherApp
 
         private string decryptText(string s)
         {
-            int key = int.Parse(tbKey.Text);
             if (lbCiphers.SelectedItem == null)
             {
                 MessageBox.Show("Please select a cipher to use!", "Warning!");
@@ -63,7 +66,7 @@ namespace CipherApp
             switch (lbCiphers.SelectedItem.ToString())
             {
                 case "Rail-Fence":
-                    plainText = RailFence.decrypt(s, key);
+                    plainText = RailFence.decrypt(s, tbKey.Text);
                     break;
                 default:
                     break;

@@ -13,12 +13,12 @@ namespace CipherApp
     public static class RailFence
     {
 
-        public static string encrypt(string s, int k) //function to encrypt using rail-fence
+        public static string encrypt(string s, string k) //function to encrypt using rail-fence
         {
             string cipherText;
-            int key = k; //get the key from text box
+            int key;
 
-            if (key <= 1)
+            if (!int.TryParse(k, out key) || key <= 1)
             {
                 return s;
             }
@@ -76,11 +76,11 @@ namespace CipherApp
 
 
 
-        public static string decrypt(string s, int k) //rail-fence deciphering algorithm
+        public static string decrypt(string s, string k) //rail-fence deciphering algorithm
         {
-            int key = k;
+            int key;
 
-            if (key <= 1)
+            if (!int.TryParse(k, out key) || key <= 1)
             {
                 return s;
             }
