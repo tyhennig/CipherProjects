@@ -75,6 +75,19 @@ namespace CipherApp
                              61, 53, 45, 37, 29, 21, 13, 5,
                              63, 55, 47, 39, 31, 23, 15, 7 };
 
+        private static readonly int[] finalPerm =
+        {
+            40,  8,   48,  16,  56,  24,  64,  32,
+            39,  7,   47,  15,  55,  23,  63,  31,
+            38,  6,   46,  14,  54,  22,  62,  30,
+            37,  5,   45,  13,  53,  21,  61,  29,
+            36,  4,   44,  12,  52,  20,  60,  28,
+            35,  3,   43,  11,  51,  19,  59,  27,
+            34,  2,   42,  10,  50,  18,  58,  26,
+            33,  1,   41,  9 ,  49,  17,  57,  25
+
+        };
+
         private static readonly int[] expansionPerm =
         {
             32,  1 ,  2  , 3  , 4  , 5,
@@ -168,18 +181,20 @@ namespace CipherApp
 
         public static string encrypt(string m, string k)
         {
-
-            
             cipherText = "";
             text = m;
             key = k;
 
-            
             textBytes = ascii.GetBytes(text);
             textBytes = padText(textBytes);
+            keyBytes = ascii.GetBytes(key);
+
+            Array.Clear(textBytes, 0, textBytes.Length);
+            Array.Clear(keyBytes, 0, keyBytes.Length);
+            
+
             setsOf64 = (textBytes.Length / 8);
 
-            keyBytes = ascii.GetBytes(key);
 
             binaryKeyString = byteToString(keyBytes);
             binaryKeyString = permutation(binaryKeyString, PC1Key, 56);
@@ -188,7 +203,7 @@ namespace CipherApp
             
             
 
-            for (int set = 0; set <= setsOf64; set++)
+            for (int set = 0; set < setsOf64; set++)
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
 
@@ -217,7 +232,7 @@ namespace CipherApp
                     string binaryRoundKey = "";
                     //byte[] newLeft;
 
-                    roundKey = getNewRoundKey(roundKey, round);
+                    roundKey = getNewRoundKey(roundKey, round); //get next 56 bit key (C+D)
 
                     binaryRoundKey = permutation(byteToString(roundKey), PC2Key, 48);
                     binaryRoundKey = dropEndBits(binaryRoundKey, 48);
@@ -230,12 +245,18 @@ namespace CipherApp
 
                     left = right;
                     right = newRight;
-
-
                 }
+
+                binaryTextString = byteToString(left);
+                binaryTextString += byteToString(right);
+
+                //binaryTextString = permutation(binaryTextString, finalPerm, 64);
+
+                cipherText += binaryTextString;
+
             }
             
-            
+            cipherText = permutation(binaryTextString, finalPerm, 64);
 
             return cipherText;
         }
@@ -266,8 +287,26 @@ namespace CipherApp
                 expByte[i] ^= key[i];
             }
 
+            e = byteToString(expByte);
 
-            return new byte[0];
+            string sBoxResult = "";
+            for(int i = 0; i < 8; i++)
+            {
+                string eSub = e.Substring(i * 6, 6);
+                string rowS = "";
+                rowS = rowS + eSub[0] + eSub[5];
+                string columnS = "";
+                columnS = eSub.Substring(1, 4);
+
+                int row = Convert.ToInt32(rowS, 2);
+                int column = Convert.ToInt32(columnS, 2);
+
+                sBoxResult += (Convert.ToString(sBox[i, row, column], 2).PadLeft(4,'0'));
+
+            }
+
+
+            return stringToByte(sBoxResult);
         }
 
         private static string rotateRight(string s, int r)
@@ -315,10 +354,11 @@ namespace CipherApp
             byte[] b = new byte[s.Length/8];
             string singleByte = "";
 
-            for(int i = 0; i < s.Length; i = i + 8)
+            for(int i = 0; i < b.Length; i++)
             {
-                singleByte = s.Substring(i, 8);
-                b.Append(Byte.Parse(singleByte));
+                singleByte = s.Substring(i*8, 8);
+
+                b[i] = Convert.ToByte(singleByte, 2);
             }
 
             
@@ -344,13 +384,13 @@ namespace CipherApp
         private static string permutation(string m, int[] array, int n)
         {
             //char[] newPermutation = m.ToCharArray();
-            StringBuilder sb = new StringBuilder(m, n);
+            StringBuilder sb = new StringBuilder(n);
             
             
 
             for(int i = 0; i < n; i++)
             {
-                sb[i] = m[array[i] - 1];
+                sb.Append(m[array[i] - 1]);
             }
 
             return sb.ToString();
