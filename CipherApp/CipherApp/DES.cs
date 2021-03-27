@@ -66,14 +66,15 @@ namespace CipherApp
         private static string cipherText;
         private static readonly int[] ROTATE1 = { 0, 1, 8, 15 };
         private static ASCIIEncoding ascii = new ASCIIEncoding();
-        private static readonly int[] initialPerm = {58, 50, 42, 34, 26, 18, 10, 2,
-                             60, 52, 44, 36, 28, 20, 12, 4,
-                             62, 54, 46, 38, 30, 22, 14, 6,
-                             64, 56, 48, 40, 32, 24, 16, 8,
-                             57, 49, 41, 33, 25, 17, 9, 1,
-                             59, 51, 43, 35, 27, 19, 11, 3,
-                             61, 53, 45, 37, 29, 21, 13, 5,
-                             63, 55, 47, 39, 31, 23, 15, 7 };
+        private static readonly int[] initialPerm = 
+            {58, 50, 42, 34, 26, 18, 10, 2,
+             60, 52, 44, 36, 28, 20, 12, 4,
+             62, 54, 46, 38, 30, 22, 14, 6,
+             64, 56, 48, 40, 32, 24, 16, 8,
+             57, 49, 41, 33, 25, 17, 9, 1,
+             59, 51, 43, 35, 27, 19, 11, 3,
+             61, 53, 45, 37, 29, 21, 13, 5,
+             63, 55, 47, 39, 31, 23, 15, 7 };
 
         private static readonly int[] finalPerm =
         {
@@ -98,6 +99,14 @@ namespace CipherApp
             20,  21,  22 , 23 , 24 , 25,
             24,  25,  26 , 27 , 28 , 29,
             28,  29,  30 , 31 , 32 , 1
+        };
+
+        private static readonly int[] keyPerm =
+        {
+            16,  7 ,  20,  21,  29,  12,  28,  17,
+            1 ,  15,  23,  26,  5 ,  18,  31,  10,
+            2 ,  8 ,  24,  14,  32,  27,  3 ,  9
+,            19,  13,  30,  6 ,  22,  11,  4 ,  25
         };
 
         private static readonly int[] PC1Key =
@@ -189,23 +198,25 @@ namespace CipherApp
             textBytes = padText(textBytes);
             keyBytes = ascii.GetBytes(key);
 
-            Array.Clear(textBytes, 0, textBytes.Length);
-            Array.Clear(keyBytes, 0, keyBytes.Length);
+            binaryKeyString = byteToString(keyBytes);
+            binaryTextString = byteToString(textBytes);
+
             
 
-            setsOf64 = (textBytes.Length / 8);
 
-
-            binaryKeyString = byteToString(keyBytes);
+            //binaryKeyString = byteToString(keyBytes);
             binaryKeyString = permutation(binaryKeyString, PC1Key, 56);
             binaryKeyString = dropEndBits(binaryKeyString, 56);
 
-            
-            
+            //textBytes = stringToByte(binaryTextString);
+            setsOf64 = (textBytes.Length / 8);
+
 
             for (int set = 0; set < setsOf64; set++)
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
+                binaryTextString = permutation(binaryTextString, initialPerm, 64);
+                textBytes = stringToByte(binaryTextString);
 
                 byte[] setTextBytes = new byte[8];
                 Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
@@ -215,16 +226,6 @@ namespace CipherApp
 
                 Array.Copy(setTextBytes, 0, left, 0, 4);
                 Array.Copy(setTextBytes, 4, right, 0, 4);
-
-
-
-                
-
-                binaryTextString = byteToString(setTextBytes);
-
-                binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                
-
 
                 for (int round = 0; round < 16; round++) //for 16 rounds of DES
                 {
@@ -247,17 +248,18 @@ namespace CipherApp
                     right = newRight;
                 }
 
-                binaryTextString = byteToString(left);
-                binaryTextString += byteToString(right);
+                binaryTextString = byteToString(right);
+                binaryTextString += byteToString(left);
 
-                //binaryTextString = permutation(binaryTextString, finalPerm, 64);
+                binaryTextString = permutation(binaryTextString, finalPerm, 64);
 
                 cipherText += binaryTextString;
 
             }
-            
-            cipherText = permutation(binaryTextString, finalPerm, 64);
 
+            //cipherText = permutation(binaryTextString, finalPerm, 64);
+
+            cipherText = Convert.ToString(Convert.ToInt64(cipherText, 2), 16);
             return cipherText;
         }
 
@@ -269,8 +271,8 @@ namespace CipherApp
             string C = binaryKey.Substring(0, 28);
             string D = binaryKey.Substring(28, 28);
 
-            rotateRight(C, (ROTATE1.Contains(round) ? 1 : 2));
-            rotateRight(D, (ROTATE1.Contains(round) ? 1 : 2));
+            C = rotateLeft(C, (ROTATE1.Contains(round) ? 1 : 2));
+            D = rotateLeft(D, (ROTATE1.Contains(round) ? 1 : 2));
             binaryKey = C + D;
             newKey = stringToByte(binaryKey);
 
@@ -305,11 +307,12 @@ namespace CipherApp
 
             }
 
+            sBoxResult = permutation(sBoxResult, keyPerm, 32);
 
             return stringToByte(sBoxResult);
         }
 
-        private static string rotateRight(string s, int r)
+        private static string rotateLeft(string s, int r)
         {
             string newString = "";
             for(int i = 0; i < s.Length; i++)
