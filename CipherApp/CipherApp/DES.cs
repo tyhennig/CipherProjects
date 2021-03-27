@@ -206,17 +206,34 @@ namespace CipherApp
 
             //binaryKeyString = byteToString(keyBytes);
             binaryKeyString = permutation(binaryKeyString, PC1Key, 56);
-            binaryKeyString = dropEndBits(binaryKeyString, 56);
+            //binaryKeyString = dropEndBits(binaryKeyString, 56);
 
             //textBytes = stringToByte(binaryTextString);
-            setsOf64 = (textBytes.Length / 8);
+
+            
+            /* 
+             * 8 -> 1       8/8 = 1
+             * 9 -> 2       9/8 = 1 !
+             * 16 -> 2      16/8 = 2
+             * 17 -> 3      17/8 = 2
+             */
+
+            if(textBytes.Length % 8 == 0)
+            {
+                setsOf64 = (textBytes.Length / 8);
+            }
+            else
+            {
+                setsOf64 = (textBytes.Length / 8) + 1;
+            }
+            
 
 
             for (int set = 0; set < setsOf64; set++)
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
                 binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                textBytes = stringToByte(binaryTextString);
+                //textBytes = stringToByte(binaryTextString);
 
                 byte[] setTextBytes = new byte[8];
                 Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
@@ -231,12 +248,12 @@ namespace CipherApp
                 {
                     byte[] newRight;
                     string binaryRoundKey = "";
-                    //byte[] newLeft;
+                    
 
                     roundKey = getNewRoundKey(roundKey, round); //get next 56 bit key (C+D)
 
                     binaryRoundKey = permutation(byteToString(roundKey), PC2Key, 48);
-                    binaryRoundKey = dropEndBits(binaryRoundKey, 48);
+                    //binaryRoundKey = dropEndBits(binaryRoundKey, 48);
                     
                     newRight = f(right, stringToByte(binaryRoundKey));
                     for(int i = 0; i < left.Length; i++)
@@ -253,13 +270,13 @@ namespace CipherApp
 
                 binaryTextString = permutation(binaryTextString, finalPerm, 64);
 
-                cipherText += binaryTextString;
+                cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
 
             }
 
             //cipherText = permutation(binaryTextString, finalPerm, 64);
 
-            cipherText = Convert.ToString(Convert.ToInt64(cipherText, 2), 16);
+            //cipherText = Convert.ToString(Convert.ToInt64(cipherText, 2), 16);
             return cipherText;
         }
 
