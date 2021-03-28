@@ -215,7 +215,7 @@ namespace CipherApp
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
                 binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                //textBytes = stringToByte(binaryTextString);
+                textBytes = stringToByte(binaryTextString);
 
                 byte[] setTextBytes = new byte[8];
                 Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
@@ -243,13 +243,15 @@ namespace CipherApp
                         newRight[i] ^= left[i];
                     }
 
+                    Console.WriteLine("Round " + round + " encryption: " + byteToString(left) + byteToString(right));
                     left = right;
                     right = newRight;
+
                 }
 
                 binaryTextString = byteToString(right);
                 binaryTextString += byteToString(left);
-
+                Console.WriteLine("Before Final Perm: " + binaryTextString);
                 binaryTextString = permutation(binaryTextString, finalPerm, 64);
                 //string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
                 //cipherText += temp;
@@ -298,7 +300,7 @@ namespace CipherApp
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
                 binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                //textBytes = stringToByte(binaryTextString);
+                textBytes = stringToByte(binaryTextString);
 
                 byte[] setTextBytes = new byte[8];
                 Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
@@ -325,6 +327,8 @@ namespace CipherApp
                     {
                         newRight[i] ^= left[i];
                     }
+
+                    Console.WriteLine("Round " + round + " decryption: " + byteToString(left) + byteToString(right));
 
                     left = right;
                     right = newRight;
