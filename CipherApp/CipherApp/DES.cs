@@ -61,6 +61,7 @@ namespace CipherApp
         private static string key;
         private static byte[] textBytes;
         private static byte[] keyBytes;
+        private static List<byte[]> generatedKeys = new List<byte[]>(); 
         private static string binaryTextString;
         private static string binaryKeyString;
         private static string cipherText;
@@ -201,34 +202,14 @@ namespace CipherApp
             binaryKeyString = byteToString(keyBytes);
             binaryTextString = byteToString(textBytes);
 
-            
 
-
-            //binaryKeyString = byteToString(keyBytes);
-            binaryKeyString = permutation(binaryKeyString, PC1Key, 56);
-            //binaryKeyString = dropEndBits(binaryKeyString, 56);
-
-            //textBytes = stringToByte(binaryTextString);
+            generateKeys(keyBytes);
 
             
-            /* 
-             * 8 -> 1       8/8 = 1
-             * 9 -> 2       9/8 = 1 !
-             * 16 -> 2      16/8 = 2
-             * 17 -> 3      17/8 = 2
-             */
-
-            if(textBytes.Length % 8 == 0)
-            {
-                setsOf64 = (textBytes.Length / 8);
-            }
-            else
-            {
-                setsOf64 = (textBytes.Length / 8) + 1;
-            }
+            //
             
-
-
+            setsOf64 = (textBytes.Length / 8);
+           
             for (int set = 0; set < setsOf64; set++)
             {
                 byte[] roundKey = stringToByte(binaryKeyString);
@@ -248,14 +229,14 @@ namespace CipherApp
                 {
                     byte[] newRight;
                     string binaryRoundKey = "";
-                    
 
-                    roundKey = getNewRoundKey(roundKey, round); //get next 56 bit key (C+D)
 
-                    binaryRoundKey = permutation(byteToString(roundKey), PC2Key, 48);
-                    //binaryRoundKey = dropEndBits(binaryRoundKey, 48);
+                    roundKey = generatedKeys.ElementAt(round);
+
                     
-                    newRight = f(right, stringToByte(binaryRoundKey));
+                    binaryRoundKey = byteToString(roundKey);
+                    
+                    newRight = f(right, roundKey);
                     for(int i = 0; i < left.Length; i++)
                     {
                         newRight[i] ^= left[i];
@@ -269,8 +250,10 @@ namespace CipherApp
                 binaryTextString += byteToString(left);
 
                 binaryTextString = permutation(binaryTextString, finalPerm, 64);
-
+                //string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
+                //cipherText += temp;
                 cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
+                
 
             }
 
@@ -278,6 +261,32 @@ namespace CipherApp
 
             //cipherText = Convert.ToString(Convert.ToInt64(cipherText, 2), 16);
             return cipherText;
+        }
+
+        private static void generateKeys(byte[] k)
+        {
+            
+            binaryKeyString = byteToString(k);
+            binaryKeyString = permutation(binaryKeyString, PC1Key, 56);
+
+            for(int i = 0; i < 16; i++)
+            {
+
+                string newKey;
+                //string binaryKeyString = byteToString(currentKey);
+                string C = binaryKeyString.Substring(0, 28);
+                string D = binaryKeyString.Substring(28, 28);
+
+                C = rotateLeft(C, (ROTATE1.Contains(i) ? 1 : 2));
+                D = rotateLeft(D, (ROTATE1.Contains(i) ? 1 : 2));
+                binaryKeyString = C + D;
+                newKey = permutation(binaryKeyString, PC2Key, 48);
+                generatedKeys.Add(stringToByte(newKey));
+                
+                //newKey = stringToByte(binaryKeyString);
+
+            }
+            
         }
 
         private static byte[] getNewRoundKey(byte[] currentKey, int round)
@@ -291,6 +300,7 @@ namespace CipherApp
             C = rotateLeft(C, (ROTATE1.Contains(round) ? 1 : 2));
             D = rotateLeft(D, (ROTATE1.Contains(round) ? 1 : 2));
             binaryKey = C + D;
+            binaryKey = permutation(binaryKey, PC2Key, 48);
             newKey = stringToByte(binaryKey);
 
             return newKey;
