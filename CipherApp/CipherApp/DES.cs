@@ -202,7 +202,7 @@ namespace CipherApp
             binaryKeyString = byteToString(keyBytes);
             binaryTextString = byteToString(textBytes);
 
-            //binaryTextString = "0000000100100011010001010110011110001001101010111100110111101111";
+            //binaryTextString = "0000000100100011010001010110011110001001101010111100110111101111"; //used for testing
             //textBytes = stringToByte(binaryTextString);
             //binaryKeyString = "0001001100110100010101110111100110011011101111001101111111110001";
             keyBytes = stringToByte(binaryKeyString);
