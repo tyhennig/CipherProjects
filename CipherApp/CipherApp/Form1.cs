@@ -47,7 +47,15 @@ namespace CipherApp
                     cipherText = RailFence.encrypt(s, tbKey.Text);
                     break;
                 case "DES":
-                    cipherText = DES.encrypt(s, tbKey.Text);
+                    if(tbKey.Text.Length == 8)
+                    {
+                        cipherText = DES.encrypt(s, tbKey.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please type a key of length 8");
+                        return null;
+                    }
                     break;
                 default:
                     break;
@@ -69,7 +77,15 @@ namespace CipherApp
                     plainText = RailFence.decrypt(s, tbKey.Text);
                     break;
                 case "DES":
-                    plainText = DES.decrypt(s, tbKey.Text);
+                    if (tbKey.Text.Length == 8)
+                    {
+                        plainText = DES.decrypt(s, tbKey.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please type a key of length 8");
+                        return null;
+                    }
                     break;
                 default:
                     break;

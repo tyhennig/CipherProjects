@@ -193,7 +193,7 @@ namespace CipherApp
         {
             cipherText = "";
             text = m;
-            key = k; 
+            key = k;
 
             textBytes = ascii.GetBytes(text);
             textBytes = padText(textBytes);
@@ -380,23 +380,6 @@ namespace CipherApp
 
             }
             
-        }
-
-        private static byte[] getNewRoundKey(byte[] currentKey, int round)
-        {
-            
-            byte[] newKey;
-            string binaryKey = byteToString(currentKey);
-            string C = binaryKey.Substring(0, 28);
-            string D = binaryKey.Substring(28, 28);
-
-            C = rotateLeft(C, (ROTATE1.Contains(round) ? 1 : 2));
-            D = rotateLeft(D, (ROTATE1.Contains(round) ? 1 : 2));
-            binaryKey = C + D;
-            binaryKey = permutation(binaryKey, PC2Key, 48);
-            newKey = stringToByte(binaryKey);
-
-            return newKey;
         }
 
         private static byte[] f(byte[] right, byte[] key)
