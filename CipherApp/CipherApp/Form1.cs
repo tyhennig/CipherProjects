@@ -76,7 +76,14 @@ namespace CipherApp
                     plainText = RailFence.decrypt(s, tbKey.Text);
                     break;
                 case "DES":
-                    plainText = DES.decrypt(s, tbKey.Text);
+                    if (tbKey.Text.Length == 8)
+                    {
+                        plainText = DES.decrypt(s, tbKey.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please type a key of size 8");
+                    }
                     break;
                 default:
                     break;
