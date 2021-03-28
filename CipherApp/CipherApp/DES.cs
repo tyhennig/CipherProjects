@@ -334,9 +334,9 @@ namespace CipherApp
                 binaryTextString += byteToString(left);
 
                 binaryTextString = permutation(binaryTextString, finalPerm, 64);
-                //string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
-                //cipherText += temp;
-                cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
+                string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
+                cipherText += temp;
+                //cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
 
 
             }
