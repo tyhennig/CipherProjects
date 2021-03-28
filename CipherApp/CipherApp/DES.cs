@@ -193,7 +193,7 @@ namespace CipherApp
         {
             cipherText = "";
             text = m;
-            key = k;
+            key = k; 
 
             textBytes = ascii.GetBytes(text);
             textBytes = padText(textBytes);
@@ -264,6 +264,88 @@ namespace CipherApp
             return cipherText;
         }
 
+        public static string decrypt(string m, string k)
+        {
+            cipherText = "";
+            text = m;
+            key = k;
+
+            //textBytes = new byte[text.Length / 2];
+
+            for(int i = 0; i < text.Length; i = i + 2)
+            {
+                textBytes[i/2] = (Convert.ToByte(text.Substring(i, 2), 16));
+            }
+            
+            
+
+            //textBytes = padText(textBytes);
+            keyBytes = ascii.GetBytes(key);
+
+            binaryKeyString = byteToString(keyBytes);
+            binaryTextString = byteToString(textBytes);
+
+            //binaryTextString = "0000000100100011010001010110011110001001101010111100110111101111"; //used for testing
+            //textBytes = stringToByte(binaryTextString);
+            //binaryKeyString = "0001001100110100010101110111100110011011101111001101111111110001";
+            keyBytes = stringToByte(binaryKeyString);
+
+            generateKeys(keyBytes);
+
+            setsOf64 = (textBytes.Length / 8);
+
+            for (int set = 0; set < setsOf64; set++)
+            {
+                byte[] roundKey = stringToByte(binaryKeyString);
+                binaryTextString = permutation(binaryTextString, initialPerm, 64);
+                //textBytes = stringToByte(binaryTextString);
+
+                byte[] setTextBytes = new byte[8];
+                Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
+
+                byte[] right = new byte[4]; //split 8 byte array into left and right sides
+                byte[] left = new byte[4];
+
+                Array.Copy(setTextBytes, 0, left, 0, 4);
+                Array.Copy(setTextBytes, 4, right, 0, 4);
+
+                for (int round = 0; round < 16; round++) //for 16 rounds of DES
+                {
+                    byte[] newRight;
+                    string binaryRoundKey = "";
+
+
+                    roundKey = generatedKeys.ElementAt(15 - round);
+
+
+                    binaryRoundKey = byteToString(roundKey);
+
+                    newRight = f(right, roundKey);
+                    for (int i = 0; i < left.Length; i++)
+                    {
+                        newRight[i] ^= left[i];
+                    }
+
+                    left = right;
+                    right = newRight;
+                }
+
+                binaryTextString = byteToString(right);
+                binaryTextString += byteToString(left);
+
+                binaryTextString = permutation(binaryTextString, finalPerm, 64);
+                //string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
+                //cipherText += temp;
+                cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
+
+
+            }
+
+            //cipherText = permutation(binaryTextString, finalPerm, 64);
+
+            //cipherText = Convert.ToString(Convert.ToInt64(cipherText, 2), 16);
+            return cipherText;
+        }
 
 
         private static void generateKeys(byte[] k)

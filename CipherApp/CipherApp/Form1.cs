@@ -68,6 +68,9 @@ namespace CipherApp
                 case "Rail-Fence":
                     plainText = RailFence.decrypt(s, tbKey.Text);
                     break;
+                case "DES":
+                    plainText = DES.decrypt(s, tbKey.Text);
+                    break;
                 default:
                     break;
             }
