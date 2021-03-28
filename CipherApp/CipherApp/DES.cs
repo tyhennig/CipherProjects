@@ -200,7 +200,7 @@ namespace CipherApp
             keyBytes = ascii.GetBytes(key);
 
             binaryKeyString = byteToString(keyBytes);
-            binaryTextString = byteToString(textBytes);
+            //binaryTextString = byteToString(textBytes);
 
             //binaryTextString = "0000000100100011010001010110011110001001101010111100110111101111"; //used for testing
             //textBytes = stringToByte(binaryTextString);
@@ -213,12 +213,14 @@ namespace CipherApp
            
             for (int set = 0; set < setsOf64; set++)
             {
-                byte[] roundKey = stringToByte(binaryKeyString);
-                binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                textBytes = stringToByte(binaryTextString);
-
                 byte[] setTextBytes = new byte[8];
-                Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
+                Array.Copy(textBytes, (set * 8), setTextBytes, 0, 8); //copy subset of bytes into this sets array
+
+                byte[] roundKey = stringToByte(binaryKeyString);
+                binaryTextString = byteToString(setTextBytes);
+                binaryTextString = permutation(binaryTextString, initialPerm, 64);
+                setTextBytes = stringToByte(binaryTextString);
+
 
                 byte[] right = new byte[4]; //split 8 byte array into left and right sides
                 byte[] left = new byte[4];
@@ -285,7 +287,7 @@ namespace CipherApp
             keyBytes = ascii.GetBytes(key);
 
             binaryKeyString = byteToString(keyBytes);
-            binaryTextString = byteToString(textBytes);
+            //binaryTextString = byteToString(textBytes);
 
             //binaryTextString = "0000000100100011010001010110011110001001101010111100110111101111"; //used for testing
             //textBytes = stringToByte(binaryTextString);
@@ -298,12 +300,14 @@ namespace CipherApp
 
             for (int set = 0; set < setsOf64; set++)
             {
-                byte[] roundKey = stringToByte(binaryKeyString);
-                binaryTextString = permutation(binaryTextString, initialPerm, 64);
-                textBytes = stringToByte(binaryTextString);
-
                 byte[] setTextBytes = new byte[8];
-                Array.Copy(textBytes, set * 8, setTextBytes, 0, 8); //copy subset of bytes into this sets array
+                Array.Copy(textBytes, (set * 8), setTextBytes, 0, 8); //copy subset of bytes into this sets array
+
+                byte[] roundKey = stringToByte(binaryKeyString);
+                binaryTextString = byteToString(setTextBytes);
+                binaryTextString = permutation(binaryTextString, initialPerm, 64);
+                setTextBytes = stringToByte(binaryTextString);
+
 
                 byte[] right = new byte[4]; //split 8 byte array into left and right sides
                 byte[] left = new byte[4];
