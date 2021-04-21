@@ -54,15 +54,36 @@ namespace CipherApp
         {
             long prime = 0;
             byte[] rnd = new byte[8];
+            bool isPrime = false;
 
-            //Random number generator safe for crypto use
-            var rng = new RNGCryptoServiceProvider();
-            rng.GetBytes(rnd);
+            do
+            {
+                //Random number generator safe for crypto use
+                var rng = new RNGCryptoServiceProvider();
+                rng.GetBytes(rnd);
+                prime = Convert.ToInt64(rnd);
+                isPrime = CheckPrime(prime);
+                rng.Dispose();
 
-            prime = Convert.ToInt64(rnd);
+            } while (isPrime);
+            
             
 
             return prime;
+        }
+
+        private static bool CheckPrime(long p)
+        {
+            long max = (long)Math.Sqrt(p);
+
+            if (p < 0) return false;
+            if (p % 2 == 0) return false;
+            for(int i = 3; i <= max; i = i + 2) //check odd numbers for 
+            {
+                if (p % i == 0) return false;
+            }
+
+            return true;
         }
 
         private static long FindE(long n)
