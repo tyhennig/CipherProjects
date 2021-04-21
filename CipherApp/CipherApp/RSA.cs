@@ -86,6 +86,25 @@ namespace CipherApp
             return true;
         }
 
+        public static long ModInverse(long a, long m)
+        {
+            
+            long m0 = m;
+            (long x, long y) = (1, 0);
+
+            while (a > 1)
+            {
+                long q = a / m;
+                (a, m) = (m, a % m);
+
+
+                (x, y) = (y, x - q * y); //find x and y such that GCD = M*X + A*Y
+
+
+            }
+            return x < 0 ? x + m0 : x;
+        }
+
         private static long FindE(long n)
         {
             return n;
