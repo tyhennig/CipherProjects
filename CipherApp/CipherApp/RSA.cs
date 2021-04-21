@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace CipherApp
 {
+
     public static class RSA
     {
         /*STEPS
@@ -26,9 +28,17 @@ namespace CipherApp
          *      
          */
 
+        public static long E = 65537;
+
         public static string encrypt(string plainText)
         {
             string cipherText = "";
+
+            long p = GeneratePrime();
+            long q = GeneratePrime();
+            long totient = (p - 1) * (q - 1);
+
+            
 
             return cipherText;
         }
@@ -43,6 +53,14 @@ namespace CipherApp
         private static long GeneratePrime()
         {
             long prime = 0;
+            byte[] rnd = new byte[8];
+
+            //Random number generator safe for crypto use
+            var rng = new RNGCryptoServiceProvider();
+            rng.GetBytes(rnd);
+
+            prime = Convert.ToInt64(rnd);
+            
 
             return prime;
         }
@@ -52,9 +70,11 @@ namespace CipherApp
             return n;
         }
 
-        private static long CalculateD(long e, long totient)
+        private static long CalculateD(long totient)
         {
-            return e;
+            //Use extended euclidian algorithm to find D
+
+            return totient;
         }
 
 
