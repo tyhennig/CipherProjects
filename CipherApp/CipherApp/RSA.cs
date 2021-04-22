@@ -27,18 +27,25 @@ namespace CipherApp
          *      Plaintext = Ciphertext^d mod(n)
          *      
          */
-
+        private static long D = 0;
+        private static long N = 0;
         public static long E = 65537;
 
         public static string encrypt(string plainText)
         {
             string cipherText = "";
-
+            byte[] pBytes = ASCIIEncoding.ASCII.GetBytes(plainText);
+            
             long p = GeneratePrime();
             long q = GeneratePrime();
+            N = p * q;
             long totient = (p - 1) * (q - 1);
+            D = ModInverse(E, totient);
 
-            
+            for(int i = 1; i >= E; i++)
+            {
+
+            }
 
             return cipherText;
         }
@@ -53,7 +60,7 @@ namespace CipherApp
         private static long GeneratePrime()
         {
             long prime = 0;
-            byte[] rnd = new byte[8];
+            byte[] rnd = new byte[4];
             bool isPrime = false;
 
             do
