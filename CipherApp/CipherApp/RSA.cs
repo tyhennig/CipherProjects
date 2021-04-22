@@ -41,11 +41,12 @@ namespace CipherApp
             //long p = GeneratePrime();
             //long q = GeneratePrime();
             /*FOR DEBUGGING*/
-            long p = 11;
-            long q = 3;
+            long p = 173;
+            long q = 149;
 
             N = p * q;
             long totient = (p - 1) * (q - 1);
+            
             D = ModInverse(E, totient);
             int count = pBytes.Count();
             
@@ -77,7 +78,13 @@ namespace CipherApp
         {
             string plainText = "";
 
-            byte[] pBytes = ASCIIEncoding.ASCII.GetBytes(cipherText);
+            byte[] pBytes = new byte[cipherText.Length / 2];
+
+            for (int i = 0; i < cipherText.Length; i = i + 2)
+            {
+                pBytes[i / 2] = (Convert.ToByte(cipherText.Substring(i, 2), 16));
+            }
+            
             int count = pBytes.Count();
 
             for (int i = 0; i < count; i = i + 8)
@@ -89,7 +96,7 @@ namespace CipherApp
                     Array.Copy(pBytes, i, temp, 0, 8);
                 ulong lNum = (ulong)BitConverter.ToInt64(temp, 0);
                 ulong exp = lNum;
-                for (int j = 1; j < E; j++)
+                for (int j = 1; j < D; j++)
                 {
                     exp = exp * lNum % (ulong)N;
 
