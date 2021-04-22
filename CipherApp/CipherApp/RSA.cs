@@ -27,6 +27,13 @@ namespace CipherApp
          *  Decryption
          *      Plaintext = Ciphertext^d mod(n)
          *      
+         *      TODO:
+         *          Right now, if the number representation of the plaintext is > N,
+         *          You cannot get the plaintext back after encrypting. This is because hex value is modded N so it can't be as large it needs to be
+         *          Solution:
+         *              Check the size of (long) plainText, if it is > N, divide it into smaller pieces
+         *      
+         *      
          */
         private static long D = 0;
         private static long N = 0;
@@ -35,8 +42,13 @@ namespace CipherApp
         public static string encrypt(string plainText)
         {
             string cipherText = "";
+            string hexText = "";
             byte[] pBytes = ASCIIEncoding.ASCII.GetBytes(plainText);
 
+            foreach(byte b in pBytes)
+            {
+                hexText += Convert.ToString(b, 16);
+            }
 
             //long p = GeneratePrime();
             //long q = GeneratePrime();
@@ -48,25 +60,32 @@ namespace CipherApp
             long totient = (p - 1) * (q - 1);
             
             D = ModInverse(E, totient);
-            int count = pBytes.Count();
+            int count = hexText.Length;
             
-            for(int i = 0; i < count; i = i + 8)
+            for(int i = 0; i < count; i = i + 16)
             {
-                byte[] temp = new byte[8];
+                //byte[] temp = new byte[8];
                 //Copy 8 bytes at a time unless there aren't 8 bytes, then copy however many are left
-                if (i + 8 > count)
-                    Array.Copy(pBytes, i, temp, 0, count % 8);
+                string tempHex = "";
+                if(i + 16 < count)
+                {
+                    tempHex = hexText.Substring(i, 16);
+
+                }
                 else
-                    Array.Copy(pBytes, i, temp, 0, 8);
-                ulong lNum = (ulong)BitConverter.ToInt64(temp, 0);
-                ulong exp = lNum;
+                {
+                    tempHex = hexText.Substring(i, count % 16);
+                }
+
+                ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
+                ulong permInt = tempInt;
                 for (int j = 1; j < E; j++)
                 {
-                    exp = exp * lNum % (ulong)N;
+                    permInt = (permInt * tempInt) % (ulong)N;
                     
                 }
-                temp = BitConverter.GetBytes(exp);
-                cipherText += Convert.ToString(BitConverter.ToInt64(temp, 0), 16);
+                
+                cipherText += Convert.ToString((long)permInt, 16);
                 //cipherText += ASCIIEncoding.ASCII.GetString(temp);
             }
             
@@ -78,32 +97,44 @@ namespace CipherApp
         {
             string plainText = "";
 
-            byte[] pBytes = new byte[cipherText.Length / 2];
-
-            for (int i = 0; i < cipherText.Length; i = i + 2)
-            {
-                pBytes[i / 2] = (Convert.ToByte(cipherText.Substring(i, 2), 16));
-            }
             
-            int count = pBytes.Count();
+            
+            int count = cipherText.Length;
 
-            for (int i = 0; i < count; i = i + 8)
+            for (int i = 0; i < count; i = i + 16)
             {
-                byte[] temp = new byte[8];
-                if (i + 8 > count)
-                    Array.Copy(pBytes, i, temp, 0, count % 8);
-                else
-                    Array.Copy(pBytes, i, temp, 0, 8);
-                ulong lNum = (ulong)BitConverter.ToInt64(temp, 0);
-                ulong exp = lNum;
-                for (int j = 1; j < D; j++)
+                //byte[] temp = new byte[8];
+                //Copy 8 bytes at a time unless there aren't 8 bytes, then copy however many are left
+                string tempHex = "";
+                if (i + 16 < count)
                 {
-                    exp = exp * lNum % (ulong)N;
+                    tempHex = cipherText.Substring(i, 16);
 
                 }
-                temp = BitConverter.GetBytes(exp);
-                plainText += ASCIIEncoding.ASCII.GetString(temp);
+                else
+                {
+                    tempHex = cipherText.Substring(i, count % 16);
+                }
+
+                ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
+                ulong permInt = tempInt;
+                for (int j = 1; j < D; j++)
+                {
+                    permInt = (permInt * tempInt) % (ulong)N;
+
+                }
+
+                plainText += Convert.ToString((long)permInt, 16);
+                //cipherText += ASCIIEncoding.ASCII.GetString(temp);
             }
+
+            string hexText = plainText;
+            byte[] pBytes = new byte[hexText.Length / 2];
+            for (int i = 0; i < hexText.Length; i = i + 2)
+            {
+                pBytes[i / 2] = (Convert.ToByte(hexText.Substring(i, 2), 16));
+            }
+            plainText = System.Text.ASCIIEncoding.ASCII.GetString(pBytes);
 
             return plainText;
         }
