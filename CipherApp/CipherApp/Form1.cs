@@ -23,6 +23,7 @@ namespace CipherApp
 
             lbCiphers.Items.Add("Rail-Fence");
             lbCiphers.Items.Add("DES");
+            lbCiphers.Items.Add("RSA");
 
         }
         
@@ -56,6 +57,9 @@ namespace CipherApp
                         MessageBox.Show("Please type a key of size 8");
                     }
                     break;
+                case "RSA":
+                    cipherText = RSA.encrypt(s);
+                    break;
                 default:
                     break;
             }
@@ -84,6 +88,9 @@ namespace CipherApp
                     {
                         MessageBox.Show("Please type a key of size 8");
                     }
+                    break;
+                case "RSA":
+                    plainText = RSA.decrypt(s);
                     break;
                 default:
                     break;
