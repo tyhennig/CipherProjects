@@ -35,9 +35,9 @@ namespace CipherApp
          *      
          *      
          */
-        private static long D = 0;
-        private static long N = 0;
-        public static long E = 3;
+        private static ulong D = 0;
+        private static ulong N = 0;
+        public static ulong E = 65537;
 
         public static string encrypt(string plainText)
         {
@@ -50,16 +50,16 @@ namespace CipherApp
                 hexText += Convert.ToString(b, 16);
             }
 
-            //long p = GeneratePrime();
-            //long q = GeneratePrime();
+            ulong p = GeneratePrime();
+            ulong q = GeneratePrime();
             /*FOR DEBUGGING*/
-            long p = 173;
-            long q = 149;
+            //long p = 173;
+            //long q = 149;
 
             N = p * q;
-            long totient = (p - 1) * (q - 1);
+            ulong totient = (p - 1) * (q - 1);
             
-            D = ModInverse(E, totient);
+            D = (ulong)ModInverse((long)E, (long)totient);
             int count = hexText.Length;
             
             for(int i = 0; i < count; i = i + 16)
@@ -79,7 +79,7 @@ namespace CipherApp
 
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
-                for (int j = 1; j < E; j++)
+                for (int j = 1; j < (long)E; j++)
                 {
                     FastModExpo(tempInt);
                     permInt = (permInt * tempInt) % (ulong)N;
@@ -119,7 +119,7 @@ namespace CipherApp
 
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
-                for (int j = 1; j < D; j++)
+                for (int j = 1; j < (long)D; j++)
                 {
                     permInt = (permInt * tempInt) % (ulong)N;
                     FastModExpo(permInt);
@@ -145,7 +145,7 @@ namespace CipherApp
 
         }
 
-        private static long GeneratePrime()
+        private static ulong GeneratePrime()
         {
             long prime = 0;
             byte[] rnd = new byte[4];
@@ -164,7 +164,7 @@ namespace CipherApp
             
             
 
-            return prime;
+            return (ulong)prime;
         }
 
         private static bool CheckPrime(long p)
@@ -206,17 +206,7 @@ namespace CipherApp
             return x < 0 ? x + m0 : x;
         }
 
-        private static long FindE(long n)
-        {
-            return n;
-        }
-
-        private static long CalculateD(long totient)
-        {
-            //Use extended euclidian algorithm to find D
-
-            return totient;
-        }
+        
 
 
     }
