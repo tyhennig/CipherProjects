@@ -50,7 +50,7 @@ namespace CipherApp
                 hexText += Convert.ToString(b, 16);
             }
 
-            long totient, p, q;
+            ulong totient, p, q;
             do
             {
                 p = GeneratePrime();
@@ -152,8 +152,8 @@ namespace CipherApp
 
         }
 
-        private static ulong GeneratePrime()
-        private static long gcd(long a, long b)
+        
+        private static ulong gcd(ulong a, ulong b)
         {
             while (a != 0 && b != 0)
             {
@@ -166,7 +166,7 @@ namespace CipherApp
             return a | b;
         }
 
-        private static long GeneratePrime()
+        private static ulong GeneratePrime()
         {
             long prime = 0;
             byte[] rnd = new byte[4];
