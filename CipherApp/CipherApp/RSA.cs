@@ -81,6 +81,7 @@ namespace CipherApp
                 ulong permInt = tempInt;
                 for (int j = 1; j < E; j++)
                 {
+                    FastModExpo(tempInt);
                     permInt = (permInt * tempInt) % (ulong)N;
                     
                 }
@@ -121,7 +122,7 @@ namespace CipherApp
                 for (int j = 1; j < D; j++)
                 {
                     permInt = (permInt * tempInt) % (ulong)N;
-
+                    FastModExpo(permInt);
                 }
 
                 plainText += Convert.ToString((long)permInt, 16);
@@ -137,6 +138,11 @@ namespace CipherApp
             plainText = System.Text.ASCIIEncoding.ASCII.GetString(pBytes);
 
             return plainText;
+        }
+
+        private static long FastModExpo(ulong l)
+        {
+
         }
 
         private static long GeneratePrime()
