@@ -195,7 +195,7 @@ namespace CipherApp
             text = m;
             key = k;
 
-            textBytes = ascii.GetBytes(text);
+            textBytes = ascii.GetBytes(text); //convert text into ascii bytes
             textBytes = padText(textBytes);
             keyBytes = ascii.GetBytes(key);
 
@@ -207,9 +207,9 @@ namespace CipherApp
             //binaryKeyString = "0001001100110100010101110111100110011011101111001101111111110001";
             keyBytes = stringToByte(binaryKeyString);
 
-            generateKeys(keyBytes);
+            generateKeys(keyBytes); //generate all 16 round keys
             
-            setsOf64 = (textBytes.Length / 8);
+            setsOf64 = (textBytes.Length / 8); //how many sets of 16 rounds will need to be done
            
             for (int set = 0; set < setsOf64; set++)
             {
@@ -218,7 +218,7 @@ namespace CipherApp
 
                 byte[] roundKey = stringToByte(binaryKeyString);
                 binaryTextString = byteToString(setTextBytes);
-                binaryTextString = permutation(binaryTextString, initialPerm, 64);
+                binaryTextString = permutation(binaryTextString, initialPerm, 64); //apply initial permutation
                 setTextBytes = stringToByte(binaryTextString);
 
 
@@ -234,7 +234,7 @@ namespace CipherApp
                     string binaryRoundKey = "";
 
 
-                    roundKey = generatedKeys.ElementAt(round);
+                    roundKey = generatedKeys.ElementAt(round); 
 
                     
                     binaryRoundKey = byteToString(roundKey);
@@ -242,7 +242,7 @@ namespace CipherApp
                     newRight = f(right, roundKey);
                     for(int i = 0; i < left.Length; i++)
                     {
-                        newRight[i] ^= left[i];
+                        newRight[i] ^= left[i]; //XOR the result of the f function with the left side (1 byte at a time)
                     }
 
                     Console.WriteLine("Round " + round + " encryption: " + byteToString(left) + byteToString(right));
@@ -257,7 +257,7 @@ namespace CipherApp
                 binaryTextString = permutation(binaryTextString, finalPerm, 64);
                 //string temp = new string(ascii.GetChars(stringToByte(binaryTextString)));
                 //cipherText += temp;
-                cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16);
+                cipherText += Convert.ToString(Convert.ToInt64(binaryTextString, 2), 16); //Convert binary string to an Int64, and then to a Hexadecimal string
                 
 
             }
@@ -274,7 +274,7 @@ namespace CipherApp
             text = m;
             key = k;
 
-            //textBytes = new byte[text.Length / 2];
+            textBytes = new byte[text.Length / 2];
 
             for(int i = 0; i < text.Length; i = i + 2)
             {
