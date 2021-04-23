@@ -35,9 +35,9 @@ namespace CipherApp
          *      
          *      
          */
-        private static long D = 0;
-        private static long N = 0;
-        public static long E = 65537;
+        private static ulong D = 0;
+        private static ulong N = 0;
+        public static ulong E = 65537;
 
         public static string encrypt(string plainText)
         {
@@ -66,7 +66,7 @@ namespace CipherApp
             
             
             
-            D = ModInverse(E, totient);
+            D = (ulong)ModInverse((long)E, (long)totient);
             int count = hexText.Length;
             
             for(int i = 0; i < count; i = i + 16)
@@ -86,8 +86,9 @@ namespace CipherApp
 
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
-                for (int j = 1; j < E; j++)
+                for (int j = 1; j < (long)E; j++)
                 {
+                    FastModExpo(tempInt);
                     permInt = (permInt * tempInt) % (ulong)N;
                     
                 }
@@ -125,10 +126,10 @@ namespace CipherApp
 
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
-                for (int j = 1; j < D; j++)
+                for (int j = 1; j < (long)D; j++)
                 {
                     permInt = (permInt * tempInt) % (ulong)N;
-
+                    FastModExpo(permInt);
                 }
 
                 plainText += Convert.ToString((long)permInt, 16);
@@ -146,6 +147,12 @@ namespace CipherApp
             return plainText;
         }
 
+        private static long FastModExpo(ulong l)
+        {
+
+        }
+
+        private static ulong GeneratePrime()
         private static long gcd(long a, long b)
         {
             while (a != 0 && b != 0)
@@ -178,7 +185,7 @@ namespace CipherApp
             
             
 
-            return prime;
+            return (ulong)prime;
         }
 
         private static bool CheckPrime(long p)
@@ -220,17 +227,7 @@ namespace CipherApp
             return x < 0 ? x + m0 : x;
         }
 
-        private static long FindE(long n)
-        {
-            return n;
-        }
-
-        private static long CalculateD(long totient)
-        {
-            //Use extended euclidian algorithm to find D
-
-            return totient;
-        }
+        
 
 
     }
