@@ -37,7 +37,9 @@ namespace CipherApp
          */
         private static ulong D = 0;
         private static ulong N = 0;
+        private static int SUBSTR_SIZE = 8;
         public static ulong E = 65537;
+
 
         public static string encrypt(string plainText)
         {
@@ -69,22 +71,23 @@ namespace CipherApp
             D = (ulong)ModInverse((long)E, (long)totient);
             int count = hexText.Length;
             
-            for(int i = 0; i < count; i = i + 16)
+            
+            for(int i = 0; i < count; i = i + SUBSTR_SIZE)
             {
                 //byte[] temp = new byte[8];
                 //Copy 8 bytes at a time unless there aren't 8 bytes, then copy however many are left
                 string tempHex = "";
-                if(i + 16 < count)
+                if(i + SUBSTR_SIZE < count)
                 {
-                    tempHex = hexText.Substring(i, 16);
+                    tempHex = hexText.Substring(i, SUBSTR_SIZE);
 
                 }
                 else
                 {
-                    tempHex = hexText.Substring(i, count % 16);
+                    tempHex = hexText.Substring(i, count % SUBSTR_SIZE);
                 }
                 
-                ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
+                ulong tempInt = (ulong)Convert.ToInt64(tempHex, SUBSTR_SIZE);
                 ulong permInt = tempInt;
                 if (tempInt > N)
                     Console.WriteLine("Warning! Plaintext larger than N!");
@@ -111,22 +114,22 @@ namespace CipherApp
             
             int count = cipherText.Length;
 
-            for (int i = 0; i < count; i = i + 16)
+            for (int i = 0; i < count; i = i + SUBSTR_SIZE)
             {
                 //byte[] temp = new byte[8];
                 //Copy 8 bytes at a time unless there aren't 8 bytes, then copy however many are left
                 string tempHex = "";
-                if (i + 16 < count)
+                if (i + SUBSTR_SIZE < count)
                 {
-                    tempHex = cipherText.Substring(i, 16);
+                    tempHex = cipherText.Substring(i, SUBSTR_SIZE);
 
                 }
                 else
                 {
-                    tempHex = cipherText.Substring(i, count % 16);
+                    tempHex = cipherText.Substring(i, count % SUBSTR_SIZE);
                 }
 
-                ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
+                ulong tempInt = (ulong)Convert.ToInt64(tempHex, SUBSTR_SIZE);
                 ulong permInt = tempInt;
                 for (int j = 1; j < (long)D; j++)
                 {
@@ -134,7 +137,7 @@ namespace CipherApp
                     FastModExpo(permInt, D, N);
                 }
 
-                plainText += Convert.ToString((long)permInt, 16);
+                plainText += Convert.ToString((long)permInt, SUBSTR_SIZE);
                 //cipherText += ASCIIEncoding.ASCII.GetString(temp);
             }
 
@@ -179,7 +182,7 @@ namespace CipherApp
                 //Random number generator safe for crypto use
                 var rng = new RNGCryptoServiceProvider();
                 rng.GetBytes(rnd);
-                prime = (long)BitConverter.ToInt32(rnd, 0);
+                prime = (long)BitConverter.ToInt16(rnd, 0);
                 isPrime = CheckPrime(prime);
                 rng.Dispose();
 
