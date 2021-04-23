@@ -83,12 +83,14 @@ namespace CipherApp
                 {
                     tempHex = hexText.Substring(i, count % 16);
                 }
-
+                
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
+                if (tempInt > N)
+                    Console.WriteLine("Warning! Plaintext larger than N!");
                 for (int j = 1; j < (long)E; j++)
                 {
-                    FastModExpo(tempInt);
+                    FastModExpo(permInt, E, N);
                     permInt = (permInt * tempInt) % (ulong)N;
                     
                 }
@@ -129,7 +131,7 @@ namespace CipherApp
                 for (int j = 1; j < (long)D; j++)
                 {
                     permInt = (permInt * tempInt) % (ulong)N;
-                    FastModExpo(permInt);
+                    FastModExpo(permInt, D, N);
                 }
 
                 plainText += Convert.ToString((long)permInt, 16);
@@ -147,9 +149,9 @@ namespace CipherApp
             return plainText;
         }
 
-        private static long FastModExpo(ulong l)
+        private static long FastModExpo(ulong num, ulong exp, ulong mod)
         {
-
+            return 0;
         }
 
         
