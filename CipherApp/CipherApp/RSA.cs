@@ -37,7 +37,7 @@ namespace CipherApp
          */
         private static long D = 0;
         private static long N = 0;
-        public static long E = 3;
+        public static long E = 65537;
 
         public static string encrypt(string plainText)
         {
@@ -50,14 +50,21 @@ namespace CipherApp
                 hexText += Convert.ToString(b, 16);
             }
 
-            //long p = GeneratePrime();
-            //long q = GeneratePrime();
+            long totient, p, q;
+            do
+            {
+                p = GeneratePrime();
+                q = GeneratePrime();
+                N = p * q;
+                totient = (p - 1) * (q - 1);
+            } while (gcd(E, totient) != 1);
+            
             /*FOR DEBUGGING*/
-            long p = 173;
-            long q = 149;
+            //long p = 173;
+            //long q = 149;
 
-            N = p * q;
-            long totient = (p - 1) * (q - 1);
+            
+            
             
             D = ModInverse(E, totient);
             int count = hexText.Length;
@@ -137,6 +144,19 @@ namespace CipherApp
             plainText = System.Text.ASCIIEncoding.ASCII.GetString(pBytes);
 
             return plainText;
+        }
+
+        private static long gcd(long a, long b)
+        {
+            while (a != 0 && b != 0)
+            {
+                if (a > b)
+                    a %= b;
+                else
+                    b %= a;
+            }
+
+            return a | b;
         }
 
         private static long GeneratePrime()
