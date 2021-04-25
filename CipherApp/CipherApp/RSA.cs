@@ -151,7 +151,20 @@ namespace CipherApp
 
         private static long FastModExpo(ulong num, ulong exp, ulong mod)
         {
-            return 0;
+            int pow = 0;
+            string binary = Convert.ToString(exp, 2);
+            for (int i = 0; i < binary.Length; i++)
+            {
+                if (binary[i] == 1)
+                {
+                    pow = Math.Pow(2, i);
+                    sum += (Math.Pow(num, pow)%mod);
+
+                }
+            }
+            sum = sum % mod; 
+
+            return sum;
         }
 
         private static string RSACalculation(bool isEncrypting, string hexText)
