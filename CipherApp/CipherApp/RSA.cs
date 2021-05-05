@@ -35,24 +35,31 @@ namespace CipherApp
          *      
          *      
          */
+
+        //Constants
         private static ulong D = 0;
         private static ulong N = 0;
         private static int SUBSTR_SIZE = 16;
         public static ulong E = 65537;
 
 
+        //encrypt function
         public static string encrypt(string plainText)
         {
             string cipherText = "";
             string hexText = "";
             byte[] pBytes = ASCIIEncoding.ASCII.GetBytes(plainText);
 
+            //convert plaintext characters into hexadecimal data
             foreach(byte b in pBytes)
             {
                 hexText += Convert.ToString(b, 16);
             }
 
             ulong totient, p, q;
+
+            //generate a set of primes until the totient is coprime with E
+            //it is common to do this instead of find E for a given totient.
             do
             {
                 p = GeneratePrime();
@@ -62,12 +69,15 @@ namespace CipherApp
             } while (gcd(E, totient) != 1);
             
             
-            /*FOR DEBUGGING*/
-            //long p = 173;
-            //long q = 149;
-
+            
+            //the private key, D, is found by MOD inverse of E
             D = (ulong)ModInverse((long)E, (long)totient);
+
+            //RSACalculation almost the same for both encrypt and decrypt, so we supply a bool parameter
+            //to flag minor changes in the algorithm
             cipherText = RSACalculation(true, hexText);
+
+            //Show the generated keys using message box
             System.Windows.Forms.MessageBox.Show("Key Generated!\n\nPublic: (E, N) = (" + E + ", " + N + ")\nPrivate: (D, N) = (" + D + ", " + N + ")");
 
             return cipherText;
@@ -81,6 +91,8 @@ namespace CipherApp
             
             string hexText = plainText;
             byte[] pBytes = new byte[hexText.Length / 2];
+
+            //convert hex data into ASCII characters
             for (int i = 0; i < hexText.Length; i = i + 2)
             {
                 pBytes[i / 2] = (Convert.ToByte(hexText.Substring(i, 2), 16));
@@ -93,10 +105,32 @@ namespace CipherApp
         private static ulong FastModExpo(ulong num, ulong exp, ulong mod)
         {
             ulong result = 1;
+            //loop through each binary digit of exponent
             while(exp > 0)
             {
-                if((exp & 1) == 1)
+                /*
+                 * This works by splitting num^exp into the binary representation
+                 * EX. 5^5 = 5^(1+4) = 5^1*5^4
+                 * 
+                 * For each bit in the exponent, we calculate the num^x portion
+                 * but we only multiply it in if the bit is 1
+                 * 
+                 * EX. 5^117
+                 *  117 = 1110101 = (2^6 + 2^5 + 2^4 + 2^2 + 2^0) = (64 + 32 + 16 + 4 + 1)
+                 *  Thus, 5^117 = 5^(64 + 32 + 16 + 4 + 1) = (5^64 * 5^32 * 5^16 * 5^4 * 5^1)
+                 *  
+                 */
+                if ((exp & 1) == 1)
                 {
+                    /*
+                     * First iteration:
+                     *  bit is 1 and num is 5^1 so we multiply num into result
+                     * Second Iteration:
+                     *  bit is 0 and num is 5^2 so we don't multiply it in
+                     * Third:
+                     *  bit is 1 and num is 5^4 so we multiply it in
+                     * Etc..
+                     */
                     result = (result * num) % mod;
                 }
                 num = (num * num) % mod;
@@ -110,11 +144,12 @@ namespace CipherApp
         {
             string returnText = "";
             int count = hexText.Length;
+            //We encrypt/decrypt SUBSTR_SIZE (8 or whatever you want) hex characters at a time
             for (int i = 0; i < count; i = i + SUBSTR_SIZE)
             {
-                //byte[] temp = new byte[8];
-                //Copy 8 bytes at a time unless there aren't 8 bytes, then copy however many are left
+                
                 string tempHex = "";
+                //Split hex into smaller sub strings
                 if (i + SUBSTR_SIZE <= count)
                 {
                     tempHex = hexText.Substring(i, SUBSTR_SIZE);
@@ -124,8 +159,10 @@ namespace CipherApp
                     tempHex = hexText.Substring(i, count % SUBSTR_SIZE);
                 }
                 
+                //convert to ulong and perform modular exponentiation
                 ulong tempInt = (ulong)Convert.ToInt64(tempHex, 16);
                 ulong permInt = tempInt;
+                //If the text is larger than N, we will not be able to decrypt
                 if (tempInt > N)
                     Console.WriteLine("Warning! Plaintext larger than N!");
 
@@ -133,6 +170,7 @@ namespace CipherApp
                 
                 tempHex = Convert.ToString((long)permInt, 16);
                 
+                //Pad left so we retain the same number of hex characters even if cipher number is smaller
                 if(isEncrypting)
                     tempHex = tempHex.PadLeft(SUBSTR_SIZE, '0');
                 returnText += tempHex;
@@ -200,16 +238,20 @@ namespace CipherApp
             long m0 = m;
             (long x, long y) = (1, 0);
 
+            //Extended Euclidian algorithm to find mod inverse
             while (a > 1)
             {
+                
                 long q = a / m;
+
                 (a, m) = (m, a % m);
 
-
+                
                 (x, y) = (y, x - q * y); //find x and y such that GCD = M*X + A*Y
 
 
             }
+            //if x is negative return x + mod to make positive
             return x < 0 ? x + m0 : x;
         }
 
